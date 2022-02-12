@@ -1,44 +1,47 @@
-import { Prop, Schema, SchemaFactory } from "@nestjs/mongoose";
-import { Document } from "mongoose";
-import * as bcrypt from "bcrypt";
+import { Prop, Schema, SchemaFactory } from '@nestjs/mongoose';
+import { Document } from 'mongoose';
+import * as bcrypt from 'bcrypt';
 
 export type UserDocument = User & Document & UserVal;
 
 export class Address {
-    addr1: string;
+  addr1: string;
 
-    addr2?: string;
+  addr2?: string;
 
-    city: string;
+  city: string;
 
-    state: string;
+  state: string;
 
-    country: string;
+  country: string;
 
-    zip: string
+  zip: string;
 }
 
 export interface UserVal {
-    isValidPassword(password: string): Promise<boolean>;
+  isValidPassword(password: string): Promise<boolean>;
+  _doc: any
 }
 
 @Schema({ timestamps: true })
 export class User {
-    @Prop({ required: true, unique: true, lowercase: true })
-    username: string;
+  @Prop({ required: true, unique: true, lowercase: true })
+  username: string;
 
-    @Prop({ required: true })
-    password: string;
+  @Prop({ required: true })
+  password: string;
 
-    @Prop({ default: false, required: true })
-    seller: boolean;
+  @Prop({ default: false, required: true })
+  seller: boolean;
 
-    @Prop({ type: Address, required: true })
-    address: Address;
+  @Prop({ type: Address, required: true })
+  address: Address;
 }
 
-export const UserSchema = SchemaFactory.createForClass(User)
+export const UserSchema = SchemaFactory.createForClass(User);
 
-UserSchema.methods.isValidPassword = async function(password: string): Promise<boolean> {
-    return await bcrypt.compare(password, this.password)
-}
+UserSchema.methods.isValidPassword = async function (
+  password: string,
+): Promise<boolean> {
+  return await bcrypt.compare(password, this.password);
+};

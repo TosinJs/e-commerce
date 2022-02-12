@@ -1,5 +1,6 @@
-import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
+ import { HttpException, HttpStatus, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
+import { sign } from 'jsonwebtoken';
 import { Model } from 'mongoose';
 import { User, UserDocument } from 'src/users/schemas/user.schema';
 import { CreateUserDto } from './dto/create-user.dto';
@@ -9,11 +10,28 @@ import { LoginUserDto } from './dto/login-user.dto';
 export class AuthService {
   constructor(@InjectModel(User.name) private readonly UserModel: Model<UserDocument>) {}
 
-  async createUser(createUserDto: CreateUserDto) {
+  async signPayload(payload: any) {
+    return sign(payload, SECRET, { expiresIn: "12h" })
+  }
+
+  async validateUser(payload: any) {
+    try {
+      return this.UserModel.findById(payload.userId)
+    } catch (error) {
+      throw new HttpException(error.message, error.status || HttpStatus.INTERNAL_SERVER_ERROR)
+    }
+  }
+
+  async createUser(createUserDto: CreateUserDto): Promise<string> {
     try {
       let newUser = new this.UserModel(createUserDto)
       newUser = await newUser.save()
-      return newUser
+      const payload = { 
+        username: newUser.username, 
+        userId: newUser.id
+      }
+      const token = await this.signPayload(payload)
+      return token
     } catch (error) {
       if (error.name === "ValidationError") {
         throw new HttpException("Invalid Input Data", HttpStatus.BAD_REQUEST)
@@ -24,10 +42,10 @@ export class AuthService {
     }
   }
 
-  async loginUser(loginUserDto: LoginUserDto) {
+  async loginUser(loginUserDto: LoginUserDto): Promise<string> {
     try {
       const { password, username } = loginUserDto
-      let user = await this.UserModel.findOne({ username })
+      const user = await this.UserModel.findOne({ username })
       if (!user) {
         throw new HttpException("Invalid Username/Password", HttpStatus.BAD_REQUEST)
       }
@@ -35,10 +53,14 @@ export class AuthService {
       if (!validPass) {
         throw new HttpException("Invalid Username/Password", HttpStatus.BAD_REQUEST)
       }
-      return user;
+      const payload = { 
+        username: user.username, 
+        userId: user.id 
+      }
+      const token = this.signPayload(payload)
+      return token;
     } catch (error) {
       throw new HttpException(error.message, error.status || HttpStatus.INTERNAL_SERVER_ERROR)
     }
   }
-  
 }

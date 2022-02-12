@@ -1,14 +1,20 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseFilters } from '@nestjs/common';
+import { Controller, Get, Post, Body, Patch, Param, Delete, UseFilters, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { HttpExceptionFilter } from 'src/core/http-exception.filter';
 import { ApiTags, ApiResponse, ApiParam, ApiBody } from '@nestjs/swagger';
+import { AuthGuard } from '@nestjs/passport';
 
 @ApiTags("Users")
 @Controller('users')
 @UseFilters(HttpExceptionFilter)
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
+
+  @UseGuards(AuthGuard("jwt"))
+  tempAuth() {
+    return { auth: "works"}
+  }
 
   @Get()
   @ApiResponse({ status: 201, description: "Users Returned"})

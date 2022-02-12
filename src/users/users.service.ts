@@ -31,7 +31,7 @@ export class UsersService {
         throw new HttpException("Not Found", HttpStatus.NOT_FOUND)
       }
       const reqUser = users.map((user) => {
-        const {password, ...reqUserData} = user
+        const {password, ...reqUserData} = user._doc
         return reqUserData
       })
       return reqUser
@@ -42,11 +42,11 @@ export class UsersService {
 
   async getUser(id: string): Promise<ReturnUserDto>{
     try {
-      let user = await this.UserModel.findById(id)
+      const user = await this.UserModel.findById(id)
       if (!user) {
         throw new HttpException("Invalid Username/Password", HttpStatus.BAD_REQUEST)
       }
-      const { password, ...reqUser} = user
+      const { password, ...reqUser} = user._doc
       return reqUser;
     } catch (error) {
       throw new HttpException(error.message, error.status || HttpStatus.INTERNAL_SERVER_ERROR)
