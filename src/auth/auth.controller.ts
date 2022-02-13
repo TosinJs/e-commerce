@@ -1,6 +1,6 @@
 import { Controller, Post, Body, UseFilters } from '@nestjs/common';
 import { ApiBody, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { HttpExceptionFilter } from 'src/core/http-exception.filter';
+import { HttpExceptionFilter } from '../core/http-exception.filter';
 import { AuthService } from './auth.service';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';

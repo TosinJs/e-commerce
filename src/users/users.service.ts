@@ -53,11 +53,11 @@ export class UsersService {
     }
   }
 
-  async updateUser(id: string, updateUserDto: UpdateUserDto): Promise<ReturnUserDto>{
+  async updateUser(id: string, updateUserDto: UpdateUserDto): Promise<ReturnUserDto> {
     try {
       await this.checkIfUserExists(id)
       const updatedUser = await this.UserModel.findByIdAndUpdate(id, updateUserDto)
-      const {password, ...reqUpdatedUser} = updatedUser
+      const {password, ...reqUpdatedUser} = updatedUser._doc
       return reqUpdatedUser
     } catch (error) {
       throw new HttpException(error.message || "Internal Server Error", error.status || HttpStatus.INTERNAL_SERVER_ERROR)

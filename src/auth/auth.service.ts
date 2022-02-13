@@ -2,19 +2,20 @@
 import { InjectModel } from '@nestjs/mongoose';
 import { sign } from 'jsonwebtoken';
 import { Model } from 'mongoose';
-import { User, UserDocument } from 'src/users/schemas/user.schema';
+import { User, UserDocument } from '../users/schemas/user.schema';
 import { CreateUserDto } from './dto/create-user.dto';
 import { LoginUserDto } from './dto/login-user.dto';
+import { Payload } from './types/payload.type';
 
 @Injectable()
 export class AuthService {
   constructor(@InjectModel(User.name) private readonly UserModel: Model<UserDocument>) {}
 
-  async signPayload(payload: any) {
-    return sign(payload, SECRET, { expiresIn: "12h" })
+  async signPayload(payload: Payload) {
+    return sign(payload, "SECRET", { expiresIn: "12h" })
   }
 
-  async validateUser(payload: any) {
+  async validateUser(payload: Payload) {
     try {
       return this.UserModel.findById(payload.userId)
     } catch (error) {
@@ -26,7 +27,7 @@ export class AuthService {
     try {
       let newUser = new this.UserModel(createUserDto)
       newUser = await newUser.save()
-      const payload = { 
+      const payload= { 
         username: newUser.username, 
         userId: newUser.id
       }

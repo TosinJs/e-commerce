@@ -1,7 +1,7 @@
-import { Controller, Get, Post, Body, Patch, Param, Delete, UseFilters, UseGuards } from '@nestjs/common';
+import { Controller, Get, Body, Patch, Param, Delete, UseFilters, UseGuards } from '@nestjs/common';
 import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
-import { HttpExceptionFilter } from 'src/core/http-exception.filter';
+import { HttpExceptionFilter } from "../core/http-exception.filter";
 import { ApiTags, ApiResponse, ApiParam, ApiBody } from '@nestjs/swagger';
 import { AuthGuard } from '@nestjs/passport';
 

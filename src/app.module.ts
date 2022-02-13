@@ -7,7 +7,6 @@ import { OrdersModule } from './orders/orders.module';
 import { ProductsModule } from './products/products.module';
 import { AuthModule } from './auth/auth.module';
 import dotenv from "dotenv";
-import { User, UserSchema } from './users/schemas/user.schema';
 
 dotenv.config()
 
