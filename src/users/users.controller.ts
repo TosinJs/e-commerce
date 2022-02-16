@@ -3,7 +3,11 @@ import { UsersService } from './users.service';
 import { UpdateUserDto } from './dto/update-user.dto';
 import { HttpExceptionFilter } from "../core/http-exception.filter";
 import { ApiTags, ApiResponse, ApiParam, ApiBody } from '@nestjs/swagger';
-import { AuthGuard } from '@nestjs/passport';
+import { Role } from 'src/auth/roles/role.enum';
+import { Roles } from 'src/auth/roles/roles.decorator';
+import { RolesGuard } from 'src/auth/roles/roles.guard';
+import { UserGuard } from 'src/auth/roles/user.guard';
+import { JwtAuthGuard } from 'src/auth/jwt-auth.guard';
 
 @ApiTags("Users")
 @Controller('users')
@@ -11,12 +15,9 @@ import { AuthGuard } from '@nestjs/passport';
 export class UsersController {
   constructor(private readonly usersService: UsersService) {}
 
-  @UseGuards(AuthGuard("jwt"))
-  tempAuth() {
-    return { auth: "works"}
-  }
-
+  @UseGuards(JwtAuthGuard, RolesGuard)
   @Get()
+  @Roles(Role.Admin)
   @ApiResponse({ status: 201, description: "Users Returned"})
   @ApiResponse({ status: 400, description: "Bad Request"})
   @ApiResponse({ status: 404, description: "No User In Database"})
@@ -24,6 +25,7 @@ export class UsersController {
     return this.usersService.getUsers();
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get(':id')
   @ApiResponse({ status: 201, description: "User Gotten By Id"})
   @ApiResponse({ status: 400, description: "Bad Request"})
@@ -33,6 +35,7 @@ export class UsersController {
     return this.usersService.getUser(id);
   }
 
+  @UseGuards(JwtAuthGuard, UserGuard)
   @Patch(":id")
   @ApiResponse({ status: 201, description: "User Updated By Id"})
   @ApiResponse({ status: 400, description: "Bad Request"})
@@ -45,6 +48,7 @@ export class UsersController {
       return this.usersService.updateUser(id, updateUserDto)
   }
 
+  @UseGuards(JwtAuthGuard, UserGuard)
   @Delete(':id')
   @ApiResponse({ status: 201, description: "User Deleted"})
   @ApiResponse({ status: 404, description: "User Not In Database"})

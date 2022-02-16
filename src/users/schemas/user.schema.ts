@@ -18,6 +18,11 @@ export class Address {
   zip: string;
 }
 
+enum Role {
+  User = "user",
+  Admin = "admin"
+}
+
 export interface UserVal {
   isValidPassword(password: string): Promise<boolean>;
   _doc: any
@@ -36,6 +41,9 @@ export class User {
 
   @Prop({ type: Address, required: true })
   address: Address;
+
+  @Prop({ type: String, required: true, default: Role.User, enum: Role})
+  role: Role;
 }
 
 export const UserSchema = SchemaFactory.createForClass(User);

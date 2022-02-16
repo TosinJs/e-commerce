@@ -17,7 +17,9 @@ export class AuthService {
 
   async validateUser(payload: Payload) {
     try {
-      return this.UserModel.findById(payload.userId)
+      const user = await this.UserModel.findById(payload.userId)
+      const { password, ...reqUserData } = user._doc
+      return reqUserData
     } catch (error) {
       throw new HttpException(error.message, error.status || HttpStatus.INTERNAL_SERVER_ERROR)
     }
